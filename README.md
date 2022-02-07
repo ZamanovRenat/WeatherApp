@@ -11,7 +11,7 @@ Create a new Git repository
 Initialize a git repository in a new or existing directory
 
 $ cd my-project/
-$ git init
+$ git init /n
 $ heroku git:remote -a renmeteobot
 Deploy your application
 Commit your code to the repository and deploy it to Heroku using Git.
