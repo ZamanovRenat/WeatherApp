@@ -1,2 +1,73 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using System.Xml.Linq;
+using System.Net;
+using Newtonsoft.Json.Linq;
+
+int update_id = 0;
+string messagFronId = "";
+string messageText = "";
+string firstName = "";
+string token = "448565330:AAFMb8-t98c2GWNh2wM392x3EjhNtYLnlTg";
+
+WebClient webClient = new WebClient();
+
+string startUrl = $"https://api.telegram.org/bot{token}";
+
+while (true)
+{
+    string url = $"{startUrl}/getUpdates?offset={update_id + 1}";
+    string response = webClient.DownloadString(url);
+
+    var Messages = JObject.Parse(response)["result"].ToArray();
+
+    foreach (var currentMessage in Messages)
+    {
+        update_id = Convert.ToInt32(currentMessage["update_id"]);
+        try
+        {
+
+            firstName = currentMessage["message"]["from"]["first_name"].ToString();
+            messagFronId = currentMessage["message"]["from"]["id"].ToString();
+            messageText = currentMessage["message"]["text"].ToString();
+
+            Console.WriteLine($"{firstName} {messagFronId} {messageText}");
+
+            messageText = GetWeather(messageText);
+
+            url = $"{startUrl}/sendMessage?chat_id={messagFronId}&text={messageText}";
+            webClient.DownloadString(url);
+        }
+
+        catch { }
+    }
+    Thread.Sleep(100); //Задрежка 0,1 сек.
+}
+
+static string GetWeather(string name)
+{
+    string path = @"C:\Programs on C#\OpenWeatherMapApp\ApiKey.txt";
+    string apiKey = "ac84fe267156a0eb4c4bd15ce6233e91";//System.IO.File.ReadAllText(path);
+
+    //Получение URL странички на которой отображается информация о погоде в формате XML
+    string url =
+        $"http://api.openweathermap.org/data/2.5/weather?q={name}&lang=ru&appid={apiKey}&units=metric&mode=xml";
+
+    Console.WriteLine(url);
+
+    //Создание объекта класса WebClient и загрузка информации с URL
+    string xmlData = new WebClient().DownloadString(url);
+
+    //Парсинг XML
+    var xmlColItem = XDocument.Parse(xmlData).Descendants("current").ToArray();
+
+    string text = string.Empty;
+
+    foreach (var item in xmlColItem)
+    {
+        text += $"Погода в городе {item.Element("city").Attribute("name").Value} сегодня, " +
+                $"{item.Element("weather").Attribute("value").Value}, " +
+                $"температура от {item.Element("temperature").Attribute("min").Value} до {item.Element("temperature").Attribute("max").Value} градусов С, " +
+                $"чувствуется как {item.Element("feels_like").Attribute("value").Value}, " +
+                $"влажность {item.Element("humidity").Attribute("value").Value} %, ";
+    }
+    return(text);
+}
