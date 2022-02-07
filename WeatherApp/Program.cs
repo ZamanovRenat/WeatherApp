@@ -6,7 +6,8 @@ int update_id = 0;
 string messagFronId = "";
 string messageText = "";
 string firstName = "";
-string token = "448565330:AAFMb8-t98c2GWNh2wM392x3EjhNtYLnlTg";
+string Path = @"D:\repos\WeatherAppToken.txt";
+string token = System.IO.File.ReadAllText(Path);
 
 WebClient webClient = new WebClient();
 
@@ -44,8 +45,8 @@ while (true)
 
 static string GetWeather(string name)
 {
-    string path = @"C:\Programs on C#\OpenWeatherMapApp\ApiKey.txt";
-    string apiKey = "ac84fe267156a0eb4c4bd15ce6233e91";//System.IO.File.ReadAllText(path);
+    string path = @"D:\repos\WeatherApp\ApiKey.txt";
+    string apiKey = System.IO.File.ReadAllText(path);
 
     //Получение URL странички на которой отображается информация о погоде в формате XML
     string url =
