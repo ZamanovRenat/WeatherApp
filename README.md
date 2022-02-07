@@ -11,6 +11,7 @@ Create a new Git repository
 Initialize a git repository in a new or existing directory
 
 $ cd my-project/
+
 $ git init 
 
 $ heroku git:remote -a renmeteobot
